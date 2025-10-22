@@ -1,0 +1,24 @@
+services:
+  - type: web
+    name: rtsp-streaming-backend
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: FRONTEND_URL
+        sync: false
+      - key: API_KEY
+        generateValue: true
+      - key: MAX_STREAMS
+        value: 10
+    disk:
+      name: streams
+      mountPath: /usr/src/app/streams
+      sizeGB: 10
