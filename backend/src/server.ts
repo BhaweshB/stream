@@ -20,7 +20,25 @@ app.use(helmet({
 }));
 
 app.use(cors({
-  origin: config.frontendUrl,
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    // Allow configured frontend URL (with or without trailing slash)
+    const allowedOrigins = [
+      config.frontendUrl,
+      config.frontendUrl.replace(/\/$/, ''), // without trailing slash
+      config.frontendUrl + '/', // with trailing slash
+      'http://localhost:5173', // local development
+    ];
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
