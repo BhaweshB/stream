@@ -23,7 +23,7 @@ app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (like mobile apps or curl)
     if (!origin) return callback(null, true);
-    
+
     // Allow configured frontend URL (with or without trailing slash)
     const allowedOrigins = [
       config.frontendUrl,
@@ -31,7 +31,7 @@ app.use(cors({
       config.frontendUrl + '/', // with trailing slash
       'http://localhost:5173', // local development
     ];
-    
+
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
@@ -40,6 +40,8 @@ app.use(cors({
     }
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'X-API-Key', 'Authorization'],
 }));
 
 app.use(morgan('combined'));
@@ -54,6 +56,9 @@ const limiter = rateLimit({
 });
 
 app.use('/api/', limiter);
+
+// Handle OPTIONS preflight requests before auth
+app.options('*', cors());
 
 // Serve HLS streams
 app.use('/streams', express.static(config.streams.outputDir, {

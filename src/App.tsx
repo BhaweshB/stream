@@ -203,7 +203,8 @@ function App() {
           setError(data.error || 'Failed to create stream')
         }
       } catch (err) {
-        setError('Backend not available. Make sure the backend server is running on port 3000.')
+        const errorMessage = err instanceof Error ? err.message : 'Unknown error'
+        setError(`Backend error: ${errorMessage}`)
         console.error('Backend error:', err)
       }
     } else if (isHTTP) {
